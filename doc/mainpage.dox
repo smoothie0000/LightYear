@@ -3,24 +3,35 @@
 
 @section design Design explanation
 
-Describe what you did here.
+Here is a brief introduction of the design/code:
+1. Init all the drivers. If any init fails, end the process
+2. Calculate the pedal angle received from ADC0
+3. Calculate the pedal angle received from ADC1
+4. Check if the pedal angles are Valid
+    - The angles should be within the defined range (0 - 30 degrees)
+    - The calculated angles from ADC0 and ADC1 should not differ too much
+5. Determine the final valid pedal angle that will be used for the torque calculation
+6. Read the current vehicle speed
+7. Calculate the torque according to the vehicle speed and pedal angle
+    - Here binary linear regression is used as the mathematic model
+    - Matlab code can be found in src/matlab/ folder
+    - The function is: torque = 2.4437 + 1.3249 * pedal_angle - 0.345 * vehicle_speed
 
-There is no need to repeat the description for what it should do that you have
-received again here.
+Below is the Sequence Diagram for the above steps:
 
-<!-- If you know plantUML and you have it installed (maybe adapt PLANTUML_JAR_PATH
-  in Doxyfile if it's not at `/usr/share/plantuml`) then you can use this:
-  @startuml
-  A -> B
-  @enduml
-
-  Otherwise you can include an image with this line:
-
-  ![Some image](doc/a.png)
--->
+![Design explanation](doc/SequenceDiagram/SequenceDiagram.png)
 
 @section remarks Remarks and suggestions
-
-Any remarks, suggestions or things that you like to point out?
-
+1. I did not spend much time to test the code, should be possible to create a test folder and write some test cases to test different input ADC values
+2. Similar as the first point, instead of writing some separate test code, I hardcoded the ADC input values, ADC returned states and the vehicle speed in the code
+3. To calculate the required torque with vehicle speed and pedal angle , the binary linear regression is used as the mathematic model
+  - However, there are some better mathematic models, e.g. Bivariate Polynomial Regression
+  - Look up table can also be an option (running faster)
+4. Some requirements are not mentioned, so I defined myself
+  - If any any init fails, end the whole process
+  - If both ADCs are broken, return pedal angle as 0
+  - If both ADCs are good, use ADC0 as default
+  - Two ADC values tolerance deviation defined as 5%
+5. The sequence diagram is drawn on the PlantUML website: https://plantuml.com/
+  - The sequence diagram code can be found in src/doc/SequenceDiagram
 */
